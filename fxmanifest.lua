@@ -25,10 +25,10 @@ server_scripts {
 files {
     'html/index.html',
     'html/style.css',
-    'html/RDRLino-Regular.ttf', 
+    'html/fonts.css',
+    'html/fonts/*.woff2',
     'html/reset.css',
     'html/script.js',
-    'html/profanity.js',
     'html/assets/*.png',
 }
 
