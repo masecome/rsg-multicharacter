@@ -3,78 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="fonts.css" rel="stylesheet">
     <link href="reset.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <title>RSG-Multicharacter</title>
 </head>
 <body>
     <div id="app" class="app is-hidden">
-        <div class="vignette"></div>
-        <div class="grain"></div>
+        <div class="scrim"></div>
+        <div class="glow"></div>
 
         <!-- Yükleme ekranı -->
-        <section id="loading" class="loading">
-            <div class="loading-emblem">
-                <svg viewBox="0 0 100 100" class="loading-ring" aria-hidden="true">
-                    <circle cx="50" cy="50" r="44" class="ring-track"/>
-                    <circle cx="50" cy="50" r="44" class="ring-fill"/>
-                </svg>
-                <svg viewBox="0 0 24 24" class="loading-star" aria-hidden="true">
-                    <path d="M12 2l2.6 6.9H22l-6 4.6 2.3 7.2L12 16.3 5.7 20.7 8 13.5 2 8.9h7.4z"/>
-                </svg>
-            </div>
+        <section class="loading">
+            <div class="logo logo-lg"><span class="logo-a"></span><span class="logo-b"></span></div>
+            <div class="loading-bar"><span></span></div>
             <p id="loading-text" class="loading-text"></p>
         </section>
 
-        <!-- Başlık -->
-        <header class="brand">
-            <span class="brand-kicker" data-lang="kicker"></span>
-            <h1 class="brand-title" data-lang="title"></h1>
-            <img class="brand-divider" src="assets/divider_line.png" alt="">
+        <!-- Üst bar -->
+        <header class="topbar">
+            <div class="logo"><span class="logo-a"></span><span class="logo-b"></span></div>
+            <div class="topbar-pill"><span class="dot"></span><span data-lang="title"></span></div>
+            <div class="topbar-count">
+                <span data-lang="slots"></span>
+                <strong id="slot-count">0 / 0</strong>
+            </div>
         </header>
 
-        <!-- Sol panel: karakter listesi -->
-        <aside class="panel roster">
-            <div class="panel-header">
-                <img src="assets/menu_header_1a.png" alt="" class="panel-header-frame">
-                <h2 data-lang="characters"></h2>
-            </div>
-            <div class="roster-meta">
-                <span data-lang="slots"></span>
-                <span id="slot-count">0 / 0</span>
-            </div>
+        <!-- Sol: başlık + karakter listesi -->
+        <section class="left">
+            <span class="kicker"><span class="dot"></span><span data-lang="kicker"></span></span>
+            <h1 class="hero">
+                <span data-lang="hero_1"></span>
+                <span class="hero-red" data-lang="hero_2"></span>
+            </h1>
+            <p class="lead" data-lang="lead"></p>
             <ul id="slot-list" class="slot-list"></ul>
-        </aside>
+        </section>
 
-        <!-- Sağ panel: karakter bilgisi -->
-        <aside id="dossier" class="panel dossier">
+        <!-- Sağ: karakter dosyası -->
+        <aside class="card dossier">
+            <div class="card-head">
+                <span class="label" data-lang="dossier"></span>
+                <span id="dossier-badge" class="badge"><span class="dot"></span><span></span></span>
+            </div>
             <div id="dossier-body"></div>
-        </aside>
-
-        <!-- Alt aksiyon çubuğu -->
-        <footer id="actions" class="actions">
-            <div class="action-buttons">
+            <div class="dossier-actions">
+                <button id="btn-play" class="btn btn-primary" type="button">
+                    <span id="btn-play-text"></span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h11.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H5z"/></svg>
+                </button>
                 <button id="btn-delete" class="btn btn-ghost" type="button">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 6h12l-1 12H7z"/></svg>
                     <span data-lang="delete"></span>
                 </button>
-                <button id="btn-play" class="btn btn-primary" type="button">
-                    <span id="btn-play-text"></span>
-                </button>
             </div>
-            <div class="key-hints">
-                <span><kbd>↑</kbd><kbd>↓</kbd> <em data-lang="hint_select"></em></span>
-                <span><kbd>ENTER</kbd> <em data-lang="hint_confirm"></em></span>
-                <span id="hint-delete"><kbd>DEL</kbd> <em data-lang="hint_delete"></em></span>
-            </div>
+        </aside>
+
+        <!-- Alt: kısayollar -->
+        <footer class="hints">
+            <span><kbd>↑</kbd><kbd>↓</kbd><em data-lang="hint_select"></em></span>
+            <span><kbd>ENTER</kbd><em data-lang="hint_confirm"></em></span>
+            <span id="hint-delete"><kbd>DEL</kbd><em data-lang="hint_delete"></em></span>
         </footer>
 
         <!-- Onay pencereleri -->
         <div id="modal-backdrop" class="modal-backdrop"></div>
 
-        <div id="modal-create" class="modal" role="dialog">
+        <div id="modal-create" class="card modal" role="dialog">
+            <div class="modal-icon"><svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></div>
             <h3 data-lang="create_title"></h3>
-            <img class="modal-divider" src="assets/divider_line.png" alt="">
             <p data-lang="create_text"></p>
             <div class="modal-buttons">
                 <button class="btn btn-ghost" data-close type="button"><span data-lang="cancel"></span></button>
@@ -82,13 +80,13 @@
             </div>
         </div>
 
-        <div id="modal-delete" class="modal modal-danger" role="dialog">
+        <div id="modal-delete" class="card modal" role="dialog">
+            <div class="modal-icon"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 6h12l-1 12H7z"/></svg></div>
             <h3 data-lang="delete_title"></h3>
-            <img class="modal-divider" src="assets/divider_line.png" alt="">
             <p id="delete-text"></p>
             <div class="modal-buttons">
                 <button class="btn btn-ghost" data-close type="button"><span data-lang="cancel"></span></button>
-                <button id="confirm-delete" class="btn btn-danger btn-hold" type="button">
+                <button id="confirm-delete" class="btn btn-primary btn-hold" type="button">
                     <span class="hold-fill"></span>
                     <span data-lang="hold_delete"></span>
                 </button>

@@ -1,33 +1,39 @@
 const RESOURCE = 'rsg-multicharacter';
 
 const Lang = {
-    kicker: 'Batı Seni Bekliyor',
+    brand_a: 'DEADWOOD',
+    brand_b: 'LIFE',
     title: 'Karakter Seçimi',
-    characters: 'Karakterler',
-    slots: 'Yuvalar',
+    slots: 'Karakterler',
+    kicker: 'Hikaye Odaklı RP · Vahşi Batı · 1899',
+    hero_1: 'Hikayene',
+    hero_2: 'Devam Et.',
+    lead: 'Kasabaya hangi karakterle adım atacağını seç ya da boş bir yuvada yeni bir hikaye başlat.',
     empty_slot: 'Boş Yuva',
     empty_sub: 'Yeni karakter oluştur',
     unemployed: 'İşsiz',
-    play: 'Oyna',
+    dossier: 'Karakter Dosyası',
+    selected: 'Seçili',
+    available: 'Müsait',
+    play: 'Oyuna Gir',
     create: 'Karakter Oluştur',
-    delete: 'Sil',
+    delete: 'Karakteri Sil',
     cancel: 'Vazgeç',
     confirm: 'Devam Et',
     hold_delete: 'Basılı Tut',
     hint_select: 'Seç',
     hint_confirm: 'Onayla',
     hint_delete: 'Sil',
-    dossier_kicker: 'Karakter Dosyası',
+    citizenid: 'Vatandaş No',
     birthdate: 'Doğum Tarihi',
     nationality: 'Uyruk',
     gender: 'Cinsiyet',
-    job: 'Meslek',
     male: 'Erkek',
     female: 'Kadın',
     cash: 'Nakit',
     bank: 'Banka',
     empty_title: 'Boş Yuva',
-    empty_text: 'Bu yuva henüz kullanılmıyor. Batıda yeni bir hikâye yazmak için bir karakter oluştur.',
+    empty_text: 'Bu yuva henüz kullanılmıyor. Kasabada yeni bir hikaye yazmak için karakter oluştur.',
     create_title: 'Yeni Karakter',
     create_text: 'Karakter oluşturucuya geçmek üzeresin. Hazır olduğunda devam et.',
     delete_title: 'Karakteri Sil',
@@ -71,8 +77,8 @@ function formatMoney(value) {
     return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function toRoman(n) {
-    return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][n - 1] || String(n);
+function pad(n) {
+    return String(n).padStart(2, '0');
 }
 
 function fullName(char) {
@@ -91,6 +97,8 @@ function applyLang() {
     document.querySelectorAll('[data-lang]').forEach((el) => {
         el.textContent = Lang[el.dataset.lang] || '';
     });
+    document.querySelectorAll('.logo-a').forEach((el) => { el.textContent = Lang.brand_a; });
+    document.querySelectorAll('.logo-b').forEach((el) => { el.textContent = Lang.brand_b; });
 }
 
 /* ---------- Yükleme ---------- */
@@ -124,16 +132,17 @@ function renderSlots() {
         if (char) {
             html += `
                 <li class="slot${selected}" data-cid="${cid}">
-                    <span class="slot-index">${toRoman(cid)}</span>
+                    <span class="slot-icon">${pad(cid)}</span>
                     <span class="slot-text">
                         <span class="slot-name">${escapeHtml(fullName(char))}</span>
-                        <span class="slot-sub">${escapeHtml(jobLabel(char))} · ${escapeHtml(char.citizenid)}</span>
+                        <span class="slot-sub">${escapeHtml(char.citizenid)} · ${escapeHtml(jobLabel(char))}</span>
                     </span>
+                    <span class="slot-cash">${formatMoney((char.money || {}).cash)}</span>
                 </li>`;
         } else {
             html += `
                 <li class="slot is-empty${selected}" data-cid="${cid}">
-                    <span class="slot-index"><svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></span>
+                    <span class="slot-icon"><svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></span>
                     <span class="slot-text">
                         <span class="slot-name">${Lang.empty_slot}</span>
                         <span class="slot-sub">${Lang.empty_sub}</span>
@@ -146,11 +155,14 @@ function renderSlots() {
 
 function renderDossier() {
     const char = state.characters[state.selected];
+    const badge = $('#dossier-badge');
+    badge.classList.toggle('is-muted', !char);
+    badge.lastElementChild.textContent = char ? Lang.selected : Lang.available;
 
     if (!char) {
         dossierBody.innerHTML = `
             <div class="dossier-empty">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M12 8v8M8 12h8"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4 0-8 2-8 5v1h9.5a6 6 0 0 1-.5-2.4c0-1.3.4-2.5 1.1-3.5-.7-.1-1.4-.1-2.1-.1zm6 0h-1.5v3h-3v1.5h3v3H18v-3h3V17h-3z"/></svg>
                 <h3>${Lang.empty_title}</h3>
                 <p>${Lang.empty_text}</p>
             </div>`;
@@ -158,19 +170,17 @@ function renderDossier() {
         const info = char.charinfo || {};
         const money = char.money || {};
         dossierBody.innerHTML = `
-            <span class="dossier-kicker">${Lang.dossier_kicker}</span>
             <h2 class="dossier-name">${escapeHtml(fullName(char))}</h2>
-            <span class="dossier-id">${escapeHtml(char.citizenid)}</span>
-            <img class="dossier-divider" src="assets/divider_line.png" alt="">
-            <dl class="facts">
-                <div class="fact"><dt>${Lang.birthdate}</dt><dd>${escapeHtml(info.birthdate || '-')}</dd></div>
-                <div class="fact"><dt>${Lang.gender}</dt><dd>${info.gender == 1 ? Lang.female : Lang.male}</dd></div>
-                <div class="fact"><dt>${Lang.nationality}</dt><dd>${escapeHtml(info.nationality || '-')}</dd></div>
-                <div class="fact"><dt>${Lang.job}</dt><dd>${escapeHtml(jobLabel(char))}</dd></div>
+            <p class="dossier-role">${escapeHtml(jobLabel(char))}</p>
+            <dl class="stats">
+                <div class="stat"><dt>${Lang.cash}</dt><dd>${formatMoney(money.cash)}</dd></div>
+                <div class="stat"><dt>${Lang.bank}</dt><dd>${formatMoney(money.bank)}</dd></div>
             </dl>
-            <dl class="purse">
-                <div class="purse-item"><dt>${Lang.cash}</dt><dd>${formatMoney(money.cash)}</dd></div>
-                <div class="purse-item"><dt>${Lang.bank}</dt><dd>${formatMoney(money.bank)}</dd></div>
+            <dl class="rows">
+                <div class="row"><dt>${Lang.citizenid}</dt><dd class="mono">${escapeHtml(char.citizenid)}</dd></div>
+                <div class="row"><dt>${Lang.birthdate}</dt><dd>${escapeHtml(info.birthdate || '-')}</dd></div>
+                <div class="row"><dt>${Lang.gender}</dt><dd>${info.gender == 1 ? Lang.female : Lang.male}</dd></div>
+                <div class="row"><dt>${Lang.nationality}</dt><dd>${escapeHtml(info.nationality || '-')}</dd></div>
             </dl>`;
     }
 
@@ -184,7 +194,6 @@ function renderActions() {
     $('#btn-play-text').textContent = char ? Lang.play : Lang.create;
     $('#btn-delete').classList.toggle('is-hidden', !char);
     $('#hint-delete').classList.toggle('is-hidden', !char);
-    app.classList.toggle('has-selection', state.selected !== null);
 }
 
 function selectSlot(cid) {
@@ -256,7 +265,7 @@ function confirmDelete() {
     closeModal();
     post('removeCharacter', { citizenid: char.citizenid });
     // İstemci menüyü yeniden açar, o zamana kadar yükleme ekranı gösterilir
-    app.classList.remove('is-ready', 'has-selection');
+    app.classList.remove('is-ready');
     startLoading();
 }
 
@@ -291,7 +300,7 @@ function openUI(nChar) {
     closeModal();
 
     $('#btn-play').disabled = false;
-    app.classList.remove('is-ready', 'has-selection');
+    app.classList.remove('is-ready');
     app.classList.remove('is-hidden');
     renderSlots();
     renderActions();
