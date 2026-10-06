@@ -1,57 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="reset.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <title>RSG-Multicharacter</title>
 </head>
-    <body>
-        <div class="container">
-            <div class="main-screen">
-                <div class="welcomescreen">
-                    <div class="loading-rondje">
-                        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-                        <p id="loading-text">Loading Characters</p>
-                    </div>
-                </div>
-                <div class="characters-list">
+<body>
+    <div id="app" class="app is-hidden">
+        <div class="vignette"></div>
+        <div class="grain"></div>
 
-                </div>
+        <!-- Yükleme ekranı -->
+        <section id="loading" class="loading">
+            <div class="loading-emblem">
+                <svg viewBox="0 0 100 100" class="loading-ring" aria-hidden="true">
+                    <circle cx="50" cy="50" r="44" class="ring-track"/>
+                    <circle cx="50" cy="50" r="44" class="ring-fill"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="loading-star" aria-hidden="true">
+                    <path d="M12 2l2.6 6.9H22l-6 4.6 2.3 7.2L12 16.3 5.7 20.7 8 13.5 2 8.9h7.4z"/>
+                </svg>
+            </div>
+            <p id="loading-text" class="loading-text"></p>
+        </section>
 
-                <div class="character-info">
-                    <div class="char-info-titel"><span id="char-info-titel">Character Information</span></div>
-                    <div class="character-info-valid">
-                        <span id="no-char">Select a character slot to see all information about your character.</span>
-                    </div>
-                </div>
+        <!-- Başlık -->
+        <header class="brand">
+            <span class="brand-kicker" data-lang="kicker"></span>
+            <h1 class="brand-title" data-lang="title"></h1>
+            <img class="brand-divider" src="assets/divider_line.png" alt="">
+        </header>
 
-                <div class="character-register">
-                    <div class="characters-register-block-header">
-                        <p>Create New Character?</p>
-                        <i class="material-icons-one" id="close-reg">close</i>
-                    </div>
-                    <div class="character-reg-btn" id="create"><p id="create-text">Confirm</p></div>
-                </div>
+        <!-- Sol panel: karakter listesi -->
+        <aside class="panel roster">
+            <div class="panel-header">
+                <img src="assets/menu_header_1a.png" alt="" class="panel-header-frame">
+                <h2 data-lang="characters"></h2>
+            </div>
+            <div class="roster-meta">
+                <span data-lang="slots"></span>
+                <span id="slot-count">0 / 0</span>
+            </div>
+            <ul id="slot-list" class="slot-list"></ul>
+        </aside>
 
-                <div class="character-delete">
-                    <div class="characters-delete-block-header">
-                        <p>Delete Character</p>
-                    </div>
+        <!-- Sağ panel: karakter bilgisi -->
+        <aside id="dossier" class="panel dossier">
+            <div id="dossier-body"></div>
+        </aside>
 
-                    <p>Are You Sure You Want To Delete Your Character?</p>
+        <!-- Alt aksiyon çubuğu -->
+        <footer id="actions" class="actions">
+            <div class="action-buttons">
+                <button id="btn-delete" class="btn btn-ghost" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 6h12l-1 12H7z"/></svg>
+                    <span data-lang="delete"></span>
+                </button>
+                <button id="btn-play" class="btn btn-primary" type="button">
+                    <span id="btn-play-text"></span>
+                </button>
+            </div>
+            <div class="key-hints">
+                <span><kbd>↑</kbd><kbd>↓</kbd> <em data-lang="hint_select"></em></span>
+                <span><kbd>ENTER</kbd> <em data-lang="hint_confirm"></em></span>
+                <span id="hint-delete"><kbd>DEL</kbd> <em data-lang="hint_delete"></em></span>
+            </div>
+        </footer>
 
-                    <div class="character-acceptdel-btn" id="accept-delete"><p id="accept-text">Confirm</p></div>
-                    <div class="character-canceldel-btn" id="cancel-delete"><p id="cancel-text">Return</p></div>
-                </div>
+        <!-- Onay pencereleri -->
+        <div id="modal-backdrop" class="modal-backdrop"></div>
+
+        <div id="modal-create" class="modal" role="dialog">
+            <h3 data-lang="create_title"></h3>
+            <img class="modal-divider" src="assets/divider_line.png" alt="">
+            <p data-lang="create_text"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-ghost" data-close type="button"><span data-lang="cancel"></span></button>
+                <button id="confirm-create" class="btn btn-primary" type="button"><span data-lang="confirm"></span></button>
             </div>
         </div>
-    </body>
-    <script type="text/javascript" src="profanity.js"></script>
-    <script type="text/javascript" src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+        <div id="modal-delete" class="modal modal-danger" role="dialog">
+            <h3 data-lang="delete_title"></h3>
+            <img class="modal-divider" src="assets/divider_line.png" alt="">
+            <p id="delete-text"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-ghost" data-close type="button"><span data-lang="cancel"></span></button>
+                <button id="confirm-delete" class="btn btn-danger btn-hold" type="button">
+                    <span class="hold-fill"></span>
+                    <span data-lang="hold_delete"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>

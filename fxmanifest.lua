@@ -28,7 +28,6 @@ files {
     'html/RDRLino-Regular.ttf', 
     'html/reset.css',
     'html/script.js',
-    'html/profanity.js',
     'html/assets/*.png',
 }
 
